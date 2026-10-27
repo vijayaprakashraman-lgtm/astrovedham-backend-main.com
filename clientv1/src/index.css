@@ -1,0 +1,129 @@
+/* ================= SIDEBAR ================= */
+.astro-sidebar {
+  background: linear-gradient(
+    180deg,
+    rgba(111, 3, 3, 0.65),
+    rgba(106, 8, 8, 0.65)
+  );
+
+  border-right: 1px solid #5a0627;
+  color: #f3f4f6;
+}
+
+/* SECTION TITLE */
+.sidebar-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* NAV LINK */
+.astro-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.25s ease;
+}
+
+/* ICON */
+.astro-nav-link i,
+.astro-nav-link svg {
+  font-size: 18px;
+  min-width: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* HOVER */
+.astro-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* ACTIVE */
+.astro-nav-link.active {
+  background-color: #ffffff;
+  color: #900c3f;
+  font-weight: 600;
+}
+
+/* ACTIVE ICON */
+.astro-nav-link.active i,
+.astro-nav-link.active svg {
+  color: #900c3f;
+}
+
+/* DIVIDER */
+.astro-divider {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ================= HEADER ================= */
+.app-header {
+ background: linear-gradient(
+    180deg,
+    rgba(174, 1, 1, 0.65),
+    rgba(106, 8, 8, 0.65)
+  );
+
+  border-bottom: 1px solid #5a0627;
+}
+
+/* USER DROPDOWN TOGGLE */
+.header-user-toggle {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+ 
+/* ================= LAYOUT HELPERS ================= */
+body {
+  overflow-x: hidden;
+}
+
+/* OVERLAY FOR MOBILE */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1029;
+}
+
+/* SIDEBAR BASE */
+.astro-sidebar {
+  width: 250px;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  bottom: 0;
+  z-index: 1030;
+  transition: transform 0.3s ease;
+}
+
+/* MOBILE HIDDEN */
+@media (max-width: 991px) {
+  .astro-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .astro-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .content-wrapper {
+    margin-left: 0 !important;
+  }
+}
+
+/* DESKTOP */
+@media (min-width: 992px) {
+  .astro-sidebar {
+    transform: translateX(0);
+  }
+}

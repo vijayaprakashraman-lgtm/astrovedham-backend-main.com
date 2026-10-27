@@ -1,0 +1,747 @@
+{
+	"info": {
+		"_postman_id": "astrovedham-customer-api-v1",
+		"name": "AstroVedham Customer App APIs",
+		"description": "Complete collection of AstroVedham Customer APIs for Mobile App Developers (Flutter / React Native / Android / iOS). Includes Authentication, Plan Types, Pricing, Cashfree Buy Now & Verify, Horoscope Generation for all 10 types, and Order History.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5002/api",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "1.1 Send OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mobile\": \"9876543210\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/send_otp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"send_otp"
+							]
+						},
+						"description": "Send 6-digit OTP to user mobile."
+					},
+					"response": []
+				},
+				{
+					"name": "1.2 Verify OTP & Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData && jsonData.data && jsonData.data.token) {",
+									"    pm.collectionVariables.set('auth_token', jsonData.data.token);",
+									"    console.log('auth_token saved:', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mobile\": \"9876543210\",\n  \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/verify_otp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"verify_otp"
+							]
+						},
+						"description": "Verify OTP and obtain JWT bearer token. (Use 123456 as master test OTP in dev)."
+					},
+					"response": []
+				},
+				{
+					"name": "1.3 Get Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customer/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"profile"
+							]
+						},
+						"description": "Fetch customer profile and active plans."
+					},
+					"response": []
+				},
+				{
+					"name": "1.4 Update Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ramesh Kumar\",\n  \"email\": \"ramesh@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/update_profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"update_profile"
+							]
+						},
+						"description": "Update customer display name and email."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Plans & Catalog",
+			"item": [
+				{
+					"name": "2.1 Get All 10 Plan Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customer/plan_types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"plan_types"
+							]
+						},
+						"description": "Get master list of 10 supported horoscope plan types with descriptions and badges."
+					},
+					"response": []
+				},
+				{
+					"name": "2.2 Get Active User Plans (Pricing)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customer/getplans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"getplans"
+							]
+						},
+						"description": "Fetch active user plans configured by Admin (price, discount %, final payable amount)."
+					},
+					"response": []
+				},
+				{
+					"name": "2.3 Get Single Plan by Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customer/plans/Single",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"plans",
+								"Single"
+							]
+						},
+						"description": "Get active plan details for a specific type (e.g. Single, Life, Yearly, Marriage, etc.)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Payment & Purchases (Cashfree)",
+			"item": [
+				{
+					"name": "3.1 Buy Now (Initiate Cashfree Payment)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Single\",\n  \"customer_name\": \"Ramesh Kumar\",\n  \"customer_email\": \"ramesh@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/buy_now",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"buy_now"
+							]
+						},
+						"description": "Initiate purchase of a plan. Returns Cashfree payment_session_id and payment_link (or simulated approval)."
+					},
+					"response": []
+				},
+				{
+					"name": "3.2 Verify Payment Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"order_id\": \"ORDER_1730000000_1234\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/verify_payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"verify_payment"
+							]
+						},
+						"description": "Call after Cashfree PG checkout completes. Verifies status with Cashfree and credits the customer's plan_pursch and transactions."
+					},
+					"response": []
+				},
+				{
+					"name": "3.3 Get Customer Purchased Plans & Transactions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customer/my_plans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"my_plans"
+							]
+						},
+						"description": "Returns customer's available plan credits (remaining_count) and transaction history."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Horoscope Generation (All 10 Types)",
+			"item": [
+				{
+					"name": "4.1 Single Horoscope",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Single\",\n  \"name\": \"Dhanraj\",\n  \"gender\": \"M\",\n  \"dob\": \"1995-05-15\",\n  \"tob\": \"10:30\",\n  \"place\": \"ERODE\",\n  \"mobile\": \"8870074461\",\n  \"emailid\": \"dhanraj@example.com\",\n  \"is_whatsapp\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate Basic Horoscope. (fnc_id is set to null, cus_id is logged-in customer, language defaults to ta)."
+					},
+					"response": []
+				},
+				{
+					"name": "4.2 Life Horoscope",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Life\",\n  \"name\": \"Kavitha\",\n  \"gender\": \"F\",\n  \"dob\": \"1998-08-20\",\n  \"tob\": \"06:45\",\n  \"place\": \"CHENNAI\",\n  \"mobile\": \"9876543210\",\n  \"emailid\": \"kavitha@example.com\",\n  \"is_whatsapp\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate Complete Life Horoscope."
+					},
+					"response": []
+				},
+				{
+					"name": "4.3 Yearly Horoscope",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Yearly\",\n  \"name\": \"Suresh\",\n  \"gender\": \"M\",\n  \"dob\": \"1992-11-04\",\n  \"tob\": \"14:15\",\n  \"place\": \"COIMBATORE\",\n  \"mobile\": \"9443322110\",\n  \"emailid\": \"\",\n  \"is_whatsapp\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate 1-Year Varshaphal Horoscope."
+					},
+					"response": []
+				},
+				{
+					"name": "4.4 Super Horoscope",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Super\",\n  \"name\": \"Priya\",\n  \"gender\": \"F\",\n  \"dob\": \"1996-03-25\",\n  \"tob\": \"09:00\",\n  \"place\": \"MADURAI\",\n  \"mobile\": \"9840011223\",\n  \"emailid\": \"priya@example.com\",\n  \"is_whatsapp\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate Super Deluxe Detailed Horoscope."
+					},
+					"response": []
+				},
+				{
+					"name": "4.5 Numerology Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Numerology\",\n  \"name\": \"Anand\",\n  \"gender\": \"M\",\n  \"dob\": \"1990-01-18\",\n  \"tob\": \"12:00\",\n  \"place\": \"SALEM\",\n  \"mobile\": \"9789012345\",\n  \"emailid\": \"\",\n  \"is_whatsapp\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate Numerology Name & Lucky Numbers Report."
+					},
+					"response": []
+				},
+				{
+					"name": "4.6 Gemstone Recommendation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Gemstone\",\n  \"name\": \"Meenakshi\",\n  \"gender\": \"F\",\n  \"dob\": \"1994-07-12\",\n  \"tob\": \"18:20\",\n  \"place\": \"TRICHY\",\n  \"mobile\": \"9655012345\",\n  \"emailid\": \"meena@example.com\",\n  \"is_whatsapp\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate Gemstone Recommendation Report."
+					},
+					"response": []
+				},
+				{
+					"name": "4.7 Wealth Horoscope",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Wealth\",\n  \"name\": \"Rajesh\",\n  \"gender\": \"M\",\n  \"dob\": \"1988-09-30\",\n  \"tob\": \"07:10\",\n  \"place\": \"TIRUPUR\",\n  \"mobile\": \"9944012345\",\n  \"emailid\": \"rajesh@example.com\",\n  \"is_whatsapp\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate Wealth, Career & Finance Astrology Report."
+					},
+					"response": []
+				},
+				{
+					"name": "4.8 MarriageH (Individual Marriage Horoscope)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"MarriageH\",\n  \"name\": \"Deepa\",\n  \"gender\": \"F\",\n  \"dob\": \"2000-02-14\",\n  \"tob\": \"11:45\",\n  \"place\": \"ERODE\",\n  \"mobile\": \"9876500000\",\n  \"emailid\": \"deepa@example.com\",\n  \"is_whatsapp\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate Marriage Prospects & Timing Horoscope."
+					},
+					"response": []
+				},
+				{
+					"name": "4.9 Marriage Matching (Porutham)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"Marriage\",\n  \"name\": \"Groom Karthik\",\n  \"gender\": \"M\",\n  \"dob\": \"1996-06-10\",\n  \"tob\": \"08:15\",\n  \"place\": \"CHENNAI\",\n  \"mobile\": \"9841023456\",\n  \"emailid\": \"karthik@example.com\",\n  \"is_whatsapp\": true,\n  \"partner\": {\n    \"name\": \"Bride Divya\",\n    \"dob\": \"1998-04-22\",\n    \"tob\": \"15:30\",\n    \"place\": \"COIMBATORE\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate 10/12 Porutham Kundali Matching for Bride & Groom."
+					},
+					"response": []
+				},
+				{
+					"name": "4.10 Pro Marriage Matching",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_type\": \"ProMarriage\",\n  \"name\": \"Groom Vignesh\",\n  \"gender\": \"M\",\n  \"dob\": \"1995-10-12\",\n  \"tob\": \"09:40\",\n  \"place\": \"MADURAI\",\n  \"mobile\": \"9894012345\",\n  \"emailid\": \"vignesh@example.com\",\n  \"is_whatsapp\": true,\n  \"partner\": {\n    \"name\": \"Bride Anitha\",\n    \"dob\": \"1997-12-05\",\n    \"tob\": \"11:20\",\n    \"place\": \"DINDIGUL\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/generate_horoscope",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"generate_horoscope"
+							]
+						},
+						"description": "Generate Advanced Comprehensive Marriage Matching & Dosha Analysis."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Order History & Downloads",
+			"item": [
+				{
+					"name": "5.1 Get Customer Order History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customer/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"orders"
+							]
+						},
+						"description": "Get all horoscope orders placed by the customer with direct download_url for generated PDFs."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
